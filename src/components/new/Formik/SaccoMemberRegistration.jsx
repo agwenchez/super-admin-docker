@@ -127,7 +127,7 @@ const SaccoMemberRegistration = () => {
             } catch (error) {
                 console.log("Some error occured=>", error.message)
                 console.log("error status=>", error.status)
-                alert(error)
+                // alert(error)
                 // resetForm()
             }
 
