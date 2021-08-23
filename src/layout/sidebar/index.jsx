@@ -182,7 +182,7 @@ const Sidebar = (props) => {
         </div>
         <div className="logo-icon-wrapper">
           {/* <h2 style={{ marginBottom: '-1.8%'}}>A</h2> */}
-          <Link to={`${process.env.PUBLIC_URL}/dashboard/`}>
+          <Link to={`/dashboard/`}>
             <h2 style={{ marginBottom: '-2.2%'}}>A</h2>
           {/* <img className="img-fluid" src={require("../../assets/images/logo/logo-icon.png")} alt="" /> */}
           </Link>

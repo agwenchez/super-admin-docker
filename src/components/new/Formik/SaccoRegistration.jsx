@@ -10,7 +10,7 @@ import { withRouter } from 'react-router';
 import Layout from "../../AppWrapper"
 
 const api = axios.create({
-    baseURL: `https://afya-kwanza-backend.herokuapp.com`
+    baseURL: `https://afya-kwanza-backend.herokuapp.com/`
 })
 
 const validationSchema = yup.object().shape({
@@ -108,10 +108,10 @@ const SaccoRegistration = () => {
             } catch (error) {
                 console.log("Some error occured=>", error.message)
                 if (error.message === 'Request failed with status code 409') {
-
                     toast.error('Sacco with that name already exists')
-                }
-                else {
+                }else if(error.message === 'Request failed with status code 422'){
+                    toast.error('Sacco admin with that email already exists')
+                }else {
                     toast.error('Internal server error')
                 }
                 // resetForm()
@@ -126,7 +126,7 @@ const SaccoRegistration = () => {
             <Grid item xs="12">
                 <Breadcrumb parent="Saccos" title="Sacco Registration" />
             </Grid>
-            <div className={classes.root} style={{ boxShadow: '5px 5px 20px #263238' }}>
+            <div className={classes.root} style={{ boxShadow: '5px 5px 20px #263238', paddingBottom: '5%'}}>
                 <Grid container spacing={3} >
                     {/* <h5 style={{borderBottom: '2px solid black'}}>Sacco Details</h5> */}
                     {/* <hr/> */}

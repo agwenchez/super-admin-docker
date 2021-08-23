@@ -6,7 +6,7 @@ import ApexCharts from 'react-apexcharts'
 import ChartistChart from 'react-chartist';
 import Knob from "knob";
 import Layout from "../AppWrapper";
-import { withRouter } from 'react-router-dom'
+import { withRouter, useHistory } from 'react-router-dom'
 import { Currentlysale, Marketvalue } from './chartsData/apex-charts-data'
 import { smallchart1data, smallchart1option, smallchart2data, smallchart2option, smallchart3data, smallchart3option, smallchart4data, smallchart4option } from './chartsData/chartist-charts-data'
 import { Send, Clock } from 'react-feather';
@@ -22,7 +22,7 @@ import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
 
 
 const api = axios.create({
-  baseURL:`https://afya-kwanza-backend.herokuapp.com`
+  baseURL:`https://afya-kwanza-backend.herokuapp.com/`
 })
 
 const Dashboard= (props) => {
@@ -32,28 +32,28 @@ const Dashboard= (props) => {
   const curHr = today.getHours()
   const curMi = today.getMinutes()
   const [meridiem, setMeridiem] = useState("AM")
+  const [data, setData] = useState({})
   const [user, setUser] = useState({})
-  const [token, setToken] = useState('')
   const [saccosCount, setSaccosCount] = useState(0)
   const [membersCount, setMembersCount] = useState(0)
+  const [hospitalsCount, setHospitalsCount] = useState(0)
+  const history = useHistory()
   // const jwt_token = localStorage.tokenated
   const getProfile = async () => {
-    setToken(localStorage.tokenated)
-    // console.log("Stored token=>",token)
     try {
       const res = await api.get("/admin/is-verified", {
-        headers: { token: token }
+        headers: { token: localStorage.tokenated}
       });
 
-      // const data = await res.json();
-
+      // !res.data && history.push('/login')
+      // console.log("Data from server==>", res.data)
       setUser(res.data.admin)
       setSaccosCount(res.data.saccos.count)
       setMembersCount(res.data.members.count)
-
+      setHospitalsCount(res.data.hospitals.count)
       // console.log("State user==>", user)
     } catch (err) {
-      console.error(err.message);
+      console.error(`An error occured: ${err.message}`);
     }
   };
 
@@ -73,7 +73,7 @@ const Dashboard= (props) => {
       setMeridiem('AM')
     }
       getProfile()
-  }, [token])
+  }, [])
 
   return (
     <Fragment>
@@ -82,16 +82,16 @@ const Dashboard= (props) => {
         <h5 style={{paddingTop:'3%', marginBottom:'3%', paddingLeft:'2%'}}>DASHBOARD</h5>
         <Container fluid={true}>
           <Row className="second-chart-list third-news-update">
-            <Col xl="4 xl-50" lg="12" className="morning-sec box-col-12" style={{ marginBottom: '5%' }}>
+            <Col xl="4 xl-50" lg="12" className="morning-sec box-col-12" >
               <Card className="o-hidden profile-greeting" style={{ backgroundImage: `url(${image})`, boxShadow: '5px 5px 20px #263238', height: '90%' }}>
-                <CardBody>
+                <CardBody style ={{ backgroundColor: 'rgba(0, 0, 0, 0.4)'}}>
                   <div className="media">
                     <div className="badge-groups w-100">
-                      <div className="badge f-12">
-                        <Clock style={{ width: "26px", height: "26px" }} className="mr-1" />
-                        <span id="txt"> <h3 style={{ color: 'black' }}>{curHr}:{curMi < 10 ? "0" + curMi : curMi} {meridiem}</h3></span>
+                      <div className="f-12" style={{display:'flex'}}>
+                        <Clock style={{ width: "30px", height: "30px", color: 'white' }} className="mr-1" />
+                        <span id="txt"> <h3 style={{ color: 'white' }}>{curHr}:{curMi < 10 ? "0" + curMi : curMi} {meridiem}</h3></span>
                       </div>
-                      <div className="badge f-12"><i className="fa fa-spin fa-cog f-14"></i></div>
+                      {/* <div className="badge f-12"><i className="fa fa-spin fa-cog f-14"></i></div> */}
                     </div>
                   </div>
                   <div className="greeting-user text-center" >
@@ -104,10 +104,62 @@ const Dashboard= (props) => {
                     </h2>
                     {/* <p><span> {"Today's earrning is $405 & your sales increase rate is 3.7 over the last 24 hours"}</span></p> */}
                     {/* <div className="whatsnew-btn"><a className="btn btn-primary" href="#javascript">{"Whats New !"}</a></div> */}
-                    <div className="left-icon"><i className="fa fa-bell"> </i></div>
+                    {/* <div className="left-icon"><i className="fa fa-bell"> </i></div> */}
                   </div>
                 </CardBody>
               </Card>
+            </Col>
+            <Col xl="4 xl-50" lg="12" className="calendar-sec box-col-6">
+              <Row>
+                <Col sm="6" xl="6" lg="6">
+                  <Card className="o-hidden" style={{ height:'85%', boxShadow: '5px 5px 20px #263238'}}>
+                    <CardBody className="bg-secondary b-r-4 card-body">
+                      <div className="media static-top-widget">
+                        <div className="align-self-center text-center"><PeopleAltIcon /></div>
+                        <div className="media-body"><span className="m-0">Saccos</span>
+                          <h4 className="mb-0 counter"><CountUp end={saccosCount} /></h4><PeopleAltIcon className="icon-bg" />
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col sm="6" xl="6" lg="6">
+                  <Card className="o-hidden" style={{ height:'85%', boxShadow: '5px 5px 20px #263238'}}>
+                    <div className="bg-secondary b-r-4 card-body">
+                      <div className="media static-top-widget">
+                        <div className="align-self-center text-center"><PeopleOutlineIcon /></div>
+                        <div className="media-body"><span className="m-0">Members</span>
+                          <h4 className="mb-0 counter"><CountUp end={membersCount} /></h4><PeopleOutlineIcon className="icon-bg" />
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+                <Col sm="6" xl="6" lg="6">
+                  <Card className="o-hidden" style={{ height:'80%', boxShadow: '5px 5px 20px #263238'}}>
+                    <CardBody className="bg-secondary b-r-4">
+                      <div className="media static-top-widget">
+                        <div className="align-self-center text-center"><LocalHospitalIcon /></div>
+                        <div className="media-body"><span className="m-0">Registered Hospitals</span>
+                          <h4 className="mb-0 counter"><CountUp end={hospitalsCount} /></h4><LocalHospitalIcon className="icon-bg" />
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+                <Col sm="6" xl="6" lg="6">
+                  <Card className="o-hidden" style={{ height:'80%', boxShadow: '5px 5px 20px #263238'}}>
+                    <CardBody className="bg-secondary b-r-4">
+                      <div className="media static-top-widget">
+                        <div className="align-self-center text-center"><LocalAtmIcon /></div>
+                        <div className="media-body"><span className="m-0">Monthly Expenditure</span>
+                          <h4 className="mb-0 counter"><CountUp end={757000} /></h4><LocalAtmIcon className="icon-bg" />
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </Col>
+              </Row>
             </Col>
             <Col xl="8 xl-100" className="dashboard-sec box-col-12">         
               <Card className="earning-card" style={{boxShadow: '5px 5px 16px #263238'}} >
@@ -141,8 +193,8 @@ const Dashboard= (props) => {
                         </Row>
                         <Row>
                           <Col xl="12">
-                            <CardBody className="p-0">
-                              <div className="current-sale-container">
+                            <CardBody className="p-0" >
+                              <div className="current-sale-container" >
                                 <ApexCharts id="chart-currently" options={Currentlysale.options} series={Currentlysale.series} type='area' height={240} />
                               </div>
                             </CardBody>
@@ -161,7 +213,7 @@ const Dashboard= (props) => {
                         </Col>
                         <Col xl="4" md="6" sm="6">
                           <div className="media p-0">
-                          <div className="media-left"><i className="icofont icofont-cur-dollar"></i></div>
+                          <div className="media-left" style={{ backgroundColor:'red'}}><i className="icofont icofont-cur-dollar"></i></div>
                             <div className="media-body">
                               <h6>Money Out</h6>
                               <p>{"Ksh757,000"}</p>
@@ -170,7 +222,7 @@ const Dashboard= (props) => {
                         </Col>
                         <Col xl="4" md="12" className="pr-0">
                           <div className="media p-0">
-                            <div className="media-left bg-secondary" ><i className="icofont icofont-cur-dollar"></i></div>
+                            <div className="media-left" ><i className="icofont icofont-cur-dollar"></i></div>
                             <div className="media-body">
                               <h6>Cash Balance</h6>
                               <p>{"Ksh743,000"}</p>
@@ -184,79 +236,7 @@ const Dashboard= (props) => {
               </Card>
               <Charts />
             </Col>
-            <Col xl="4 xl-50" lg="12" className="calendar-sec box-col-6">
-              <Row>
-                <Col sm="6" xl="6" lg="6">
-                  <Card className="o-hidden" style={{ height:'85%', boxShadow: '5px 5px 20px #263238'}}>
-                    <CardBody className="bg-secondary b-r-4 card-body">
-                      <div className="media static-top-widget">
-                        <div className="align-self-center text-center"><PeopleAltIcon /></div>
-                        <div className="media-body"><span className="m-0">Saccos</span>
-                          <h4 className="mb-0 counter"><CountUp end={saccosCount} /></h4><PeopleAltIcon className="icon-bg" />
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-                <Col sm="6" xl="6" lg="6">
-                  <Card className="o-hidden" style={{ height:'85%', boxShadow: '5px 5px 20px #263238'}}>
-                    <div className="bg-secondary b-r-4 card-body">
-                      <div className="media static-top-widget">
-                        <div className="align-self-center text-center"><PeopleOutlineIcon /></div>
-                        <div className="media-body"><span className="m-0">Members</span>
-                          <h4 className="mb-0 counter"><CountUp end={membersCount} /></h4><PeopleOutlineIcon className="icon-bg" />
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-                <Col sm="6" xl="6" lg="6">
-                  <Card className="o-hidden" style={{ height:'75%', boxShadow: '5px 5px 20px #263238'}}>
-                    <CardBody className="bg-secondary b-r-4">
-                      <div className="media static-top-widget">
-                        <div className="align-self-center text-center"><LocalHospitalIcon /></div>
-                        <div className="media-body"><span className="m-0">Registered Hospitals</span>
-                          <h4 className="mb-0 counter"><CountUp end={54} /></h4><LocalHospitalIcon className="icon-bg" />
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-                <Col sm="6" xl="6" lg="6">
-                  <Card className="o-hidden" style={{ height:'75%', boxShadow: '5px 5px 20px #263238'}}>
-                    <CardBody className="bg-secondary b-r-4">
-                      <div className="media static-top-widget">
-                        <div className="align-self-center text-center"><LocalAtmIcon /></div>
-                        <div className="media-body"><span className="m-0">Monthly Expenditure</span>
-                          <h4 className="mb-0 counter"><CountUp end={757000} /></h4><LocalAtmIcon className="icon-bg" />
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                </Col>
-                {/* <Col sm="6" xl="6" lg="6">
-                      This is col 1
-                    </Col>
-                    <Col sm="6" xl="6" lg="6">
-                      This is col 2
-                    </Col>
-                    <Col sm="6" xl="6" lg="6">
-                      This is col 3
-                    </Col>
-                    <Col sm="6" xl="6" lg="6">
-                      This is col 4
-                    </Col> */}
-              </Row>
 
-              {/* <div className="default-datepicker">
-                    <DatePicker
-                      selected={startDate}
-                      onChange={handleChange}
-                      inline
-                    />
-                  </div><span className="default-dots-stay overview-dots full-width-dots"><span className="dots-group"><span className="dots dots1"></span><span className="dots dots2 dot-small"></span><span className="dots dots3 dot-small"></span><span className="dots dots4 dot-medium"></span><span className="dots dots5 dot-small"></span><span className="dots dots6 dot-small"></span><span className="dots dots7 dot-small-semi"></span><span className="dots dots8 dot-small-semi"></span><span className="dots dots9 dot-small">                </span></span></span> */}
-
-            </Col>
           </Row>
         </Container>
       </Layout>

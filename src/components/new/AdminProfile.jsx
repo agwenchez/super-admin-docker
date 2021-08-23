@@ -9,7 +9,7 @@ import { withRouter , useHistory} from 'react-router';
 import Avatar from 'react-avatar'
 
 const api = axios.create({
-  baseURL: `https://afya-kwanza-backend.herokuapp.com`
+  baseURL: `https://afya-kwanza-backend.herokuapp.com/`
 })
 
 
@@ -19,20 +19,17 @@ const AdminProfile = ({location}) => {
   // const [token, setToken] = useState('')
   const [user, setUser] = useState({})
   const [id, setId] = useState('')
-  const [token, setToken] = useState('')
   const history = useHistory()
 
 
   const getProfile = async () => {
-    setToken(localStorage.tokenated)
+    const token =localStorage.tokenated
     // console.log("Stored token=>",token)
     try {
       const res = await api.get("/admin/is-verified", {
         headers: { token: token }
       });
 
-
-      console.log("Admin from server=>", res.data.admin)
       setUser(res.data.admin)
 
     } catch (err) {
@@ -66,7 +63,7 @@ const AdminProfile = ({location}) => {
     // setId(location.state.id)
     // console.log("sacco id=>", id)
 
-  }, [token])
+  }, [])
 
  
 
@@ -91,7 +88,7 @@ const AdminProfile = ({location}) => {
                       </a>
                     </div> */}
                     </CardHeader>
-                    <CardBody style={{ marginTop: "7%" }}>
+                    <CardBody style={{ marginTop: "1.5%" }}>
                       <Row className="mb-4">
                         <div className="col-auto">
                          <Avatar maxInitials={1} size={60} round={true} name={user.name}  color={'blue'}/> 

@@ -32,7 +32,7 @@ setLanguageCookie();
 
 
 const api = axios.create({
-  baseURL:`https://afya-kwanza-backend.herokuapp.com`
+  baseURL:`https://afya-kwanza-backend.herokuapp.com/`
 })
 
 
@@ -133,8 +133,6 @@ const Rightbar = (props) => {
 
   const logout = ()=>{
       localStorage.removeItem('tokenated');
-      console.log("Removed token shoudl be undefined", localStorage.tokenated)
-      // localStorage.removeItem('auth');
       history.push('/login')
   }
 
@@ -187,7 +185,7 @@ const Rightbar = (props) => {
               <Avatar maxInitials={1} size={40} round={true} name={name} color={'gray'} /> 
               <div className="media-body">
                 <span>{name}</span>
-                <p className="mb-0 font-roboto">super_admin <i className="middle fa fa-angle-down"></i></p>
+                <p className="mb-0 font-roboto">Super Admin <i className="middle fa fa-angle-down"></i></p>
               </div>
             </div>
             <ul className="profile-dropdown onhover-show-div">

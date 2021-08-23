@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useEffect, forwardRef } from 'react';
 import { Container } from 'reactstrap'
-import { Grid, Button, IconButton } from '@material-ui/core/'
+import { Grid, Button, Tooltip } from '@material-ui/core/'
 import MaterialTable from "material-table";
 import { AddBox, ArrowDownward, Check, ChevronLeft, ChevronRight, Clear, DeleteOutline, Edit, FilterList, FirstPage, LastPage, Remove, ViewColumn, SaveAlt, Search } from "@material-ui/icons";
 import axios from 'axios';
@@ -40,13 +40,8 @@ const tableIcons = {
 
 
 const api = axios.create({
-  baseURL: `https://afya-kwanza-backend.herokuapp.com`
+  baseURL: `https://afya-kwanza-backend.herokuapp.com/`
 })
-
-function validateEmail(email) {
-  const re = /^((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))$/;
-  return re.test(String(email).toLowerCase());
-}
 
 const SaccoTable = () => {
   const [data, setData] = useState([]); //table data
@@ -56,6 +51,7 @@ const SaccoTable = () => {
   const history = useHistory();
 
   var columns = [
+    // { render: rowData => rowData.tableData.id + 1 },
     // { title: "Avatar", render: rowData => <Avatar maxInitials={1} size={40} round={true} name={rowData === undefined ? " " : rowData.sacco_name} /> },
     { title: "Sacco Name", field: "sacco_name" },
     { title: "Admin FirstName", field: "admin_firstname" },
@@ -85,9 +81,9 @@ const SaccoTable = () => {
             }
           }}
         >
-          {/* <IconButton aria-label="delete"> */}
+        <Tooltip title="Edit">
           <EditIcon style={{ color: 'black' }} />
-          {/* </IconButton> */}
+        </Tooltip>
         </Link>
       )
     },
@@ -124,8 +120,11 @@ const SaccoTable = () => {
 
 
   useEffect(() => {
+    const token = localStorage.tokenated
     setLoading(true)
-    api.get('/saccos/all')
+    api.get('/saccos/all', {
+       headers: { token: token }
+      })
       .then(res => {
         // console.log("data =>", res.data)
         setRiders(res.data)
@@ -178,7 +177,7 @@ const SaccoTable = () => {
                     icons={tableIcons}
                     options={{
                       exportButton: true,
-                      selection: true,
+                      // selection: true,
                       // filtering: true,
                       sorting: true,
                       actionsColumnIndex: -1,
@@ -187,13 +186,13 @@ const SaccoTable = () => {
                       pageSize: 10,
                       pageSizeOptions: [25, 50, 100, 200, 300, 400, 500, 600, 700]
                     }}
-                    actions={[
-                      {
-                        tooltip: 'Remove All Selected Users',
-                        icon: DeleteOutline,
-                        onClick: (evt, data) => alert('You want to delete ' + data.length + ' rows')
-                      }
-                    ]}
+                    // actions={[
+                    //   {
+                    //     tooltip: 'Remove All Selected Users',
+                    //     icon: DeleteOutline,
+                    //     onClick: (evt, data) => alert('You want to delete ' + data.length + ' rows')
+                    //   }
+                    // ]}
 
                   />)}
               </Grid>

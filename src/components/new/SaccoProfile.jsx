@@ -9,7 +9,7 @@ import { withRouter , useHistory} from 'react-router';
 import Avatar from 'react-avatar'
 
 const api = axios.create({
-  baseURL: `https://afya-kwanza-backend.herokuapp.com`
+  baseURL: `https://afya-kwanza-backend.herokuapp.com/`
 })
 
 
@@ -23,14 +23,9 @@ const SaccoProfile = ({location}) => {
 
 
   const getProfile = async () => {
-    // setToken(localStorage.tokenated)
-    // console.log("Stored token=>", token)
-
-    setName(location.state.sacco_name)
-    console.log("Stored name=>", name)
 
     try {
-      const res = await api.get(`/saccos/sacco/${name}`);
+      const res = await api.get(`/saccos/sacco/${location.state.sacco_name}`);
 
       // console.log("state data==>", res.data[0])
       // const data = await res.json();
@@ -65,9 +60,9 @@ const SaccoProfile = ({location}) => {
 
     getProfile()
     setId(location.state.id)
-    console.log("sacco id=>", id)
+    // console.log("sacco id=>", id)
 
-  }, [name,id])
+  }, [])
 
  
 
@@ -98,7 +93,7 @@ const SaccoProfile = ({location}) => {
                          <Avatar maxInitials={1} size={65} round={true} name={data.sacco_name}  color={'blue'}/> 
                         </div>
                         <Col>
-                          <h5 className="mb-1 mt-2">{name} Sacco</h5>
+                          <h5 className="mb-1 mt-2">{data.sacco_name} Sacco</h5>
                           <p className="mb-2">Admin: {data.admin_firstname} {data.admin_lastname}</p>
                         </Col>
                       </Row>

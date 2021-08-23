@@ -9,8 +9,9 @@ import { toast } from 'react-toastify';
 import Layout from "../AppWrapper"
 import EditIcon from '@material-ui/icons/Edit';
 import ConfirmDelete from './ConfirmDelete';
-import { Button, Grid } from '@material-ui/core/';
+import { Button, Grid, Tooltip } from '@material-ui/core/';
 import CustomizedProgressBars from './CircularProgress';
+import PeopleOutlineIcon from '@material-ui/icons/PeopleOutline';
 
 // import { Delete } from 'react-feather';
 
@@ -38,36 +39,63 @@ const tableIcons = {
 
 
 const api = axios.create({
-  baseURL: `https://afya-kwanza-backend.herokuapp.com`
+  baseURL: `https://afya-kwanza-backend.herokuapp.com/`
 })
-
-function validateEmail(email) {
-  const re = /^((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))$/;
-  return re.test(String(email).toLowerCase());
-}
-
 
 
 const MembersTable = () => {
-  const [riders, setRiders] = useState([])
+  const [members, setMembers] = useState([])
   const [loading, setLoading] = useState(false)
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [dependants, setDependants] = useState([])
 
 
   var columns = [
-    { title: "id", field: "id", hidden: true },
-    // { title: "Avatar", render: rowData => <Avatar maxInitials={1} size={40} round={true} name={rowData === undefined ? " " : rowData.first_name} /> },
-    { title: "Name", field: "name" },
-    { title: "Email", field: "email" },
-    { title: "Phone No", field: "phonenumber" },
-    { title: "Location", field: "location" },
+    // { render: rowData => rowData.tableData.id + 1 },
+    {
+      // cellStyle: {
+      //   marginLeft: "-10%"
+      // },
+      // headerStyle: {
+      //   marginLeft: "-10%"
+      // },
+      title: "Full Name", field: "full_name"
+    },
+    { title: "D.O.B", field: "date_of_birth" },
+    { title: "ID No", field: "id_number" },
+    { title: "Phone Number", field: "phonenumber" },
+    { title: "Gender", field: "gender" },
     { title: "Sacco", field: "sacco" },
-    { title: "Insruance Plan", field: "insurance_plan" },
+    { title: "Route Name", field: "route_name" },
+    { title: "Email", field: "email" },
     {
       cellStyle: {
-        paddingLeft: "8%"
+        paddingLeft: "2%"
       },
       headerStyle: {
-        paddingLeft: "8%"
+        paddingLeft: "2%"
+      },
+      render: rowData => (
+        <Link
+          to={{
+            pathname: "/dashboard/members/dependants",
+            state: {
+              id: rowData.id_number
+            }
+          }}
+        >
+          <Tooltip title="Dependant(s)">
+            <PeopleOutlineIcon style={{ color: 'black' }} />
+          </Tooltip>
+        </Link>
+      )
+    },
+    {
+      cellStyle: {
+        paddingLeft: "2%"
+      },
+      headerStyle: {
+        paddingLeft: "2%"
       },
       render: rowData => (
         <Link
@@ -78,21 +106,13 @@ const MembersTable = () => {
             }
           }}
         >
-          {/* <IconButton aria-label="delete"> */}
-          <EditIcon style={{ color: 'black' }} />
-          {/* </IconButton> */}
+          <Tooltip title="Edit">
+            <EditIcon style={{ color: 'black' }} />
+          </Tooltip>
         </Link>
       )
     },
-    {
-      cellStyle: {
-        paddingRight: "5%"
-      },
-      headerStyle: {
-        paddingRight: "5%"
-      },
-      render: rowData => (<ConfirmDelete onDelete={() => handleDelete(rowData.member_id)} name={rowData.name} openDialog={openDialog} />)
-    },
+    { render: rowData => (<ConfirmDelete onDelete={() => handleDelete(rowData.member_id)} name={rowData.full_name} openDialog={openDialog} />) }
 
   ]
 
@@ -101,10 +121,10 @@ const MembersTable = () => {
   const handleDelete = async (id) => {
     try {
       const res = await api.delete(`/members/delete/${id}`)
-      const dataDelete = [...riders];
-      const afterDelete = dataDelete.filter(rider => rider.member_id !== id);
+      const dataDelete = [...members];
+      const afterDelete = dataDelete.filter(member => member.member_id !== id);
 
-      setRiders([...afterDelete]);
+      setMembers([...afterDelete]);
       if (res.status == 200) {
         toast.success(res.data)
       }
@@ -117,12 +137,15 @@ const MembersTable = () => {
   }
 
   const getMemmbers = async () => {
+
     try {
       setLoading(true)
-      const res = await api.get('/members/all')
+      const res = await api.get('/members/all', {
+        headers: { token: localStorage.tokenated}
+      })
       // console.log("Data from API==>", res.data)
       setLoading(false)
-      setRiders(res.data)
+      setMembers(res.data)
 
     } catch (error) {
       console.log("Error==>", error.message)
@@ -140,6 +163,7 @@ const MembersTable = () => {
   const history = useHistory();
 
 
+  // console.log("State Data==>", members)
   return (
     <Layout>
       <>
@@ -170,25 +194,58 @@ const MembersTable = () => {
                     title="Sacco Members"
                     style={{ zIndex: '0' }}
                     columns={columns}
-                    data={riders}
+                    data={members}
                     icons={tableIcons}
                     options={{
                       exportButton: true,
-                      selection: true,
-                      // filtering: true,
+                      rowStyle: rowData => ({
+                        backgroundColor: (selectedRow === rowData.tableData.id) ? '#EEE' : 'white'
+                      }),
                       actionsColumnIndex: -1,
                       search: true,
                       paginationType: 'normal',
-                      pageSize: 10,
-                      pageSizeOptions: [25, 50, 100, 200, 300, 400, 500, 600, 700]
+                      pageSize: 25,
+                      pageSizeOptions: [50, 100]
                     }}
-                    actions={[
-                      {
-                        tooltip: 'Remove All Selected Users',
-                        icon: DeleteOutline,
-                        onClick: (evt, data) => alert('You want to delete ' + data.length + ' rows')
-                      }
-                    ]}
+                  // detailPanel={[
+                  //   {
+                  //     tooltip: 'Show Name',
+                  //     render: rowData => {
+
+                  //       const getDependants = async (id) =>{
+                  //         try {
+                  //           let dependants = await api.get(`/dependants/all_dependants/${id}`)
+                  //           dependants = dependants.data
+                  //           console.log("Dependants from DB=>", dependants)
+                  //           return dependants
+                  //         } catch (error) {
+                  //           console.log("error occured=>", error)
+                  //         }
+                  //       }
+
+                  //       (async () =>{
+
+                  //         const dependantsFromDB = await getDependants(rowData.id_number);
+                  //         setDependants(dependantsFromDB)
+                  //         // console.log("Dependants inside IIFE=>", dependants)
+
+                  //       })()
+                  //       console.log("Dependants from state=>", dependants)
+                  //       return (
+                  //         <div
+                  //           style={{
+                  //             fontSize: 100,
+                  //             textAlign: 'center',
+                  //             color: 'white',
+                  //             backgroundColor: '#43A047',
+                  //           }}
+                  //         >
+                  //           {rowData.full_name}
+                  //         </div>
+                  //       )
+                  //     },
+                  //   }
+                  // ]}
 
                   />)}
               </Grid>

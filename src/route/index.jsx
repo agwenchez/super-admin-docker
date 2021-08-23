@@ -82,13 +82,6 @@ export const routes = [
 
         { path:"/app/users/userProfile", Component:UserProfile},
         { path:"/app/users/userEdit", Component:UserEdit},
-        { path:"/app/users/userCards", Component:UserCards},
-
-
-
-
-       
-
-        
+        { path:"/app/users/userCards", Component:UserCards}
 
 ]

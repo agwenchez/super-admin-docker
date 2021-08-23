@@ -15,28 +15,30 @@ import ProtectedRoute from "../auth/ProtectedRoute"
 import SaccoProfile from '../components/new/SaccoProfile';
 import MemberEdit from './new/MemberEdit';
 import AdminProfile from './new/AdminProfile';
+import HospitalsTable from './new/HospitalsTable';
+import HospitalRegistration from './new/Formik/HospitalRegistration';
+import HospitalEdit from './new/HospitalEdit';
+import DependantsTable from './new/DependantsTable';
+import DependantsRegistration from './new/Formik/DependantsRegistration';
+import DependantEdit from './new/DependantEdit';
+import Transactions from './new/Transactions';
 // import UserProfile from './users/userProfile';
+import axios from 'axios'
+import FileUploader from './new/FileUploader';
+import FileUpload from './new/FileUpload';
+import SaccoTransactions from './new/SaccoTransactions';
 
+
+const api = axios.create({
+  baseURL:`https://afya-kwanza-backend.herokuapp.com/`
+})
 const App = () => {
-  const [token,setToken]= useState('')
-  const logout = ()=>{
-  
-      setToken(localStorage.removeItem("tokenated"))
-      window.location.href = '/login'
-    
-  }
-
-  useEffect(()=>{
-    setInterval(logout, 60000*45);
-  },[token])
 
 
   return (
     
-    <Fragment>
-      {/* <Layout /> */}
-
-      <Router basename={'/'}>
+    <>
+      <Router basename={'/afya/super-admin'}>
         <Switch>
           {/* <Route
             exact
@@ -50,9 +52,42 @@ const App = () => {
             }
           /> */}
           <Route exact path='/' render={() => <Redirect to="/dashboard" />} />
-          <Route exact path='/login' component={Login} />
+          <Route exact path='/login' component={Login}  render={() => localStorage.tokenated && <Redirect to="/dashboard" />}/>
+
+          <Route path="/dashboard/members/import">
+            <ProtectedRoute Component={FileUpload}/>
+          </Route>
+
+          <Route path="/dashboard/billing/sacco/transactions">
+            <ProtectedRoute Component={SaccoTransactions}/>
+          </Route>
+
+          <Route path="/dashboard/billing/transactions">
+            <ProtectedRoute Component={Transactions}/>
+          </Route>
+
+          <Route path="/dashboard/members/dependants/edit">
+            <ProtectedRoute Component={DependantEdit}/>
+          </Route>
+
+          <Route path="/dashboard/members/dependants/new">
+           <ProtectedRoute Component={DependantsRegistration}/>
+          </Route>
+          
           <Route path="/dashboard/saccos/new">
             <ProtectedRoute Component={SaccoRegistration}/>
+          </Route>
+
+          <Route path="/dashboard/hospitals/new">
+            <ProtectedRoute Component={HospitalRegistration}/>
+          </Route>
+
+          <Route path="/dashboard/hospitals/edit">
+            <ProtectedRoute Component={HospitalEdit}/>
+          </Route>
+
+          <Route path="/dashboard/hospitals">
+            <ProtectedRoute Component={HospitalsTable}/>
           </Route>
 
           <Route path="/dashboard/admin/profile">    
@@ -66,6 +101,11 @@ const App = () => {
           <Route path="/dashboard/members/edit">
             <ProtectedRoute Component={MemberEdit}/>
           </Route>
+
+          <Route path="/dashboard/members/dependants">
+            <ProtectedRoute Component={DependantsTable}/>
+          </Route>
+
 
           <Route path="/dashboard/saccos/edit">
             <ProtectedRoute Component={SaccoProfile}/>
@@ -86,65 +126,6 @@ const App = () => {
           
 
 
-
-           {/* <Route
-            exact
-            path="/dashboard"
-            render={() =>
-              token === undefined || user === null ? (
-                <Login />
-              ) : (
-                <Dashboard/>
-              )
-            }
-          /> */}
-
-          {/* <Route
-            exact
-            path="/dashboard/members"
-            render={() =>
-              token !== undefined || user !== null ? (
-                <Members />
-              ) : (
-                <Redirect to="/login" />
-              )
-            }
-          />
-          <Route
-            exact
-            path="/dashboard/members/new"
-            render={() =>
-              token !== undefined || user !== null ? (
-                <SaccoMemberRegistration />
-              ) : (
-                <Redirect to="/login" />
-              )
-            }
-          />
-          <Route
-            exact
-            path="/dashboard/saccos"
-            render={() =>
-              token !== undefined || user !== null ? (
-                <Saccos />
-              ) : (
-                <Redirect to="/login" />
-              )
-            }
-          />
-          <Route
-            exact
-            path="/dashboard/saccos/new"
-            render={() =>
-              token !== undefined || user !== null ? (
-                <SaccoRegistration />
-              ) : (
-                <Redirect to="/login" />
-              )
-            }
-          /> */}
-
-
           {/* <Route exact path='/dashboard' component={Dashboard} />
           <Route exact path='/dashboard/saccos' component={Saccos} />
           <Route exact path='/dashboard/members' component={Members} />
@@ -154,7 +135,7 @@ const App = () => {
       </Router>
       <ToastContainer />
       <ThemeCustomizer />
-    </Fragment>
+    </>
   );
 }
 export default App;

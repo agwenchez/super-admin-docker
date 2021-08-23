@@ -8,21 +8,31 @@ import { toast } from 'react-toastify';
 import Breadcrumb from '../../../layout/breadcrumb';
 import { useHistory, withRouter } from "react-router-dom";
 import Layout from "../../AppWrapper"
-
+// import 'date-fns';
+// import DateFnsUtils from '@date-io/date-fns';
+// import {
+//     MuiPickersUtilsProvider,
+//     KeyboardTimePicker,
+//     KeyboardDatePicker,
+// } from '@material-ui/pickers';
 
 
 const api = axios.create({
-    baseURL: `https://afya-kwanza-backend.herokuapp.com`
-  })
-  
+    baseURL: `https://afya-kwanza-backend.herokuapp.com/`
+})
+
 const validationSchema = yup.object().shape({
-    name: yup
-        .string('Enter a name')
-        .required('Name is a required field'),
+    full_name: yup
+        .string('Enter full name')
+        .required('Full name is a required field'),
     email: yup
         .string('Enter your email')
         .email('Enter a valid email')
-        .required('Email is required'),
+        .required('Email is a required field'),
+    id_number: yup
+        .string('Enter ID number')
+        // .max(10, 'Phone number should be 10 characters max')
+        .required('ID number is a required field'),
     phonenumber: yup
         .string('Enter phone number')
         .max(10, 'Phone number should be 10 characters max')
@@ -30,15 +40,30 @@ const validationSchema = yup.object().shape({
     sacco: yup
         .string('Select a sacco')
         .required('Sacco is a required field'),
-    location: yup
-        .string('Enter location')
-        .required('Location is a required field'),
-    insurance_plan: yup
-        .string('Enter insurance plan')
-        .required('Insurance plan is a required field')
+    route_name: yup
+        .string('Enter a route name')
+        .required('Route name is a required field'),
+    gender: yup
+        .string('Select a gender')
+        .required('Gender is a required field'),
+    date_of_birth: yup
+        .string('Enter date of birth')
+        .required('Date of birth is a required field')
 });
 
 
+
+const gender = [
+    {
+        name: ''
+    },
+    {
+        name: 'Male'
+    },
+    {
+        name: 'Female'
+    }
+]
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -83,37 +108,44 @@ const useStyles = makeStyles((theme) => ({
 
 const SaccoMemberRegistration = () => {
     const classes = useStyles();
-    const [saccos, setSaccos] = useState([]);
     const [data, setData] = useState([]);
-    useEffect(() => {
-      
-        // setSaccos(JSON.parse(localStorage.saccos));
-        // console.log(("saccos=>", saccos))
-    api.get('/saccos/all')
-    .then(res => {
-        // console.log("data =>", res.data)
-      
-        const saccos = res.data
-        saccos.unshift({sacco_name:""})
-        // console.log("Saccos ushifted==>", saccos)
-        setData(res.data)
-        // localStorage.setItem('saccos', JSON.stringify(res.data))
-        // console.log("saccos localstorage =>",localStorage.saccos)
+    const [selectedDate, setSelectedDate] = React.useState();
 
-    }
-    ).catch(error => {
-        console.log("Error", error)
-    })
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
+
+    useEffect(() => {
+
+       const token = localStorage.tokenated
+
+        api.get('/saccos/all', {
+            headers: { token: token }
+        })
+            .then(res => {
+                // console.log("data =>", res.data)
+
+                const saccos = res.data
+                saccos.unshift({ sacco_name: "" })
+                setData(res.data)
+                console.log("Saccos=>", data)
+
+            }
+            ).catch(error => {
+                console.log("Error", error)
+            })
     }, [])
 
     const formik = useFormik({
         initialValues: {
-            name: '',
+            full_name: '',
+            date_of_birth: '',
             email: '',
             phonenumber: '',
+            id_number: '',
             sacco: '',
-            location: '',
-            insurance_plan: ''
+            route_name: '',
+            gender: ''
         },
         validationSchema: validationSchema,
         onSubmit: async (values, { setSubmitting, resetForm }) => {
@@ -121,14 +153,13 @@ const SaccoMemberRegistration = () => {
             try {
                 setSubmitting(true);
                 const response = await api.post('/members/add', values)
-                console.log("response object", response)
+                // console.log("response object", response)
                 toast.success(response.data)
                 resetForm()
             } catch (error) {
-                console.log("Some error occured=>", error.message)
-                console.log("error status=>", error.status)
-                // alert(error)
-                // resetForm()
+                error.message == 'Network Error' && toast.error("Kindly check your network connection!")
+                error.message == 'Request failed with status code 409' && toast.error("Another member exists with that email/phone number/ID number")
+                error.message == 'Request failed with status code 500' && toast.error("Internal Server error")
             }
 
         },
@@ -142,29 +173,87 @@ const SaccoMemberRegistration = () => {
                 <Grid item xs="12">
                     <Breadcrumb parent="Members" title="Sacco Member Registration" />
                 </Grid>
-                <div className={classes.root} style={{ boxShadow: '5px 5px 20px #263238'}}>
+                <div className={classes.root} style={{ boxShadow: '5px 5px 20px #263238' }}>
                     <Grid container spacing={3} >
                         <Grid item xs="12">
                             <form onSubmit={formik.handleSubmit} className={classes.form}>
                                 <Grid container spacing={3}>
                                     <Grid item xs="12" sm="6">
                                         <TextField
-                                            id="name"
-                                            name="name"
-                                            label="NAME"
+                                            id="full_name"
+                                            name="full_name"
+                                            label="FULL NAME"
                                             className={classes.textField}
-                                            placeholder="Enter name"
+                                            placeholder="Enter full name"
                                             margin="normal"
                                             InputLabelProps={{
                                                 shrink: true,
                                             }}
                                             size="small"
                                             variant="outlined"
-                                            value={formik.values.name}
+                                            value={formik.values.full_name}
                                             onChange={formik.handleChange}
-                                            error={formik.touched.name && Boolean(formik.errors.name)}
-                                            helperText={formik.touched.name && formik.errors.name}
+                                            error={formik.touched.full_name && Boolean(formik.errors.full_name)}
+                                            helperText={formik.touched.full_name && formik.errors.full_name}
                                             autoFocus
+                                        />
+
+                                    </Grid>
+                                    <Grid item xs="12" sm="6">
+                                        {/* <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                            <KeyboardDatePicker
+                                                disableToolbar
+                                                variant="inline"
+                                                format="MM/dd/yyyy"
+                                                margin="normal"
+                                                id="date-picker-inline"
+                                                label="Date picker inline"
+                                                value={selectedDate}
+                                                onChange={handleDateChange}
+                                                KeyboardButtonProps={{
+                                                    'aria-label': 'change date',
+                                                }}
+                                            />
+                                        </MuiPickersUtilsProvider> */}
+                                        <TextField
+                                            id="date_of_birth"
+                                            name="date_of_birth"
+                                            label="DATE OF BIRTH"
+                                            className={classes.textField}
+                                            placeholder="Enter date of birth"
+                                            margin="normal"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            size="small"
+                                            variant="outlined"
+                                            value={formik.values.date_of_birth}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.date_of_birth && Boolean(formik.errors.date_of_birth)}
+                                            helperText={formik.touched.date_of_birth && formik.errors.date_of_birth}
+                                        />
+                                    </Grid>
+
+                                </Grid>
+                                <Grid container spacing={3}>
+                                    <Grid item xs="12" sm="6">
+                                        <TextField
+                                            label="ID NUMBER"
+                                            id="id_number"
+                                            name="id_number"
+                                            placeholder="Enter ID Number"
+                                            style={{ marginTop: '2.3ch' }}
+                                            className={classes.textField}
+                                            margin="normal"
+                                            size="small"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            variant="outlined"
+                                            value={formik.values.id_number}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.id_number && Boolean(formik.errors.id_number)}
+                                            helperText={formik.touched.id_number && formik.errors.id_number}
                                         />
 
                                     </Grid>
@@ -173,7 +262,7 @@ const SaccoMemberRegistration = () => {
                                             label="EMAIL"
                                             id="email"
                                             name="email"
-                                            placeholder="Email"
+                                            placeholder="Enter email"
                                             className={classes.textField}
                                             margin="normal"
                                             size="small"
@@ -195,7 +284,7 @@ const SaccoMemberRegistration = () => {
                                             label="PHONE NUMBER"
                                             id="phonenumber"
                                             name="phonenumber"
-                                            placeholder="Phone Number"
+                                            placeholder="Enter phone Number"
                                             style={{ marginTop: '2.3ch' }}
                                             className={classes.textField}
                                             margin="normal"
@@ -212,10 +301,64 @@ const SaccoMemberRegistration = () => {
                                     </Grid>
                                     <Grid item xs="12" sm="6">
                                         <TextField
+                                            id="gender"
+                                            name="gender"
+                                            select
+                                            label="GENDER"
+                                            className={classes.textField}
+                                            // value={saccos}
+                                            style={{ marginTop: '2.3ch' }}
+                                            SelectProps={{
+                                                native: true,
+                                            }}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            size="small"
+                                            defaultValue={""}
+                                            value={formik.values.gender}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.gender && Boolean(formik.errors.gender)}
+                                            helperText={formik.touched.gender && formik.errors.gender}
+                                            variant="outlined"
+                                        >
+
+                                            {gender.map((option) => (
+                                                <option key={option.name} value={option.name}>
+                                                    {option.name}
+                                                </option>
+                                            ))}
+
+                                        </TextField>
+                                    </Grid>
+
+                                </Grid>
+                                <Grid container spacing={3}>
+                                    <Grid item xs>
+                                        <TextField
+                                            label="ROUTE NAME"
+                                            id="route_name"
+                                            name="route_name"
+                                            placeholder="Enter route name"
+                                            className={classes.textField}
+                                            margin="normal"
+                                            size="small"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            variant="outlined"
+                                            value={formik.values.route_name}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.route_name && Boolean(formik.errors.route_name)}
+                                            helperText={formik.touched.route_name && formik.errors.route_name}
+                                        />
+                                    </Grid>
+                                    <Grid item xs>
+                                        <TextField
                                             id="sacco"
                                             name="sacco"
                                             select
-                                            label="Sacco"
+                                            label="SACCO"
                                             className={classes.textField}
                                             // value={saccos}
                                             style={{ marginTop: '2.3ch' }}
@@ -241,47 +384,7 @@ const SaccoMemberRegistration = () => {
                                             ))}
 
                                         </TextField>
-                                    </Grid>
 
-                                </Grid>
-                                <Grid container spacing={3}>
-                                    <Grid item xs>
-                                        <TextField
-                                            label="LOCATION"
-                                            id="location"
-                                            name="location"
-                                            placeholder="Location"
-                                            className={classes.textField}
-                                            margin="normal"
-                                            size="small"
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            variant="outlined"
-                                            value={formik.values.location}
-                                            onChange={formik.handleChange}
-                                            error={formik.touched.location && Boolean(formik.errors.location)}
-                                            helperText={formik.touched.location && formik.errors.location}
-                                        />
-                                    </Grid>
-                                    <Grid item xs>
-                                        <TextField
-                                            label="INSURANCE PLAN"
-                                            id="insurance_plan"
-                                            name="insurance_plan"
-                                            placeholder="Insurance plan"
-                                            className={classes.textField}
-                                            margin="normal"
-                                            size="small"
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            variant="outlined"
-                                            value={formik.values.insurance_plan}
-                                            onChange={formik.handleChange}
-                                            error={formik.touched.insurance_plan && Boolean(formik.errors.insurance_plan)}
-                                            helperText={formik.touched.insurance_plan && formik.errors.insurance_plan}
-                                        />
                                     </Grid>
 
                                 </Grid>
@@ -302,7 +405,7 @@ const SaccoMemberRegistration = () => {
                                         <div className={classes.div}>
                                             <Button type="submit" disabled={formik.isSubmitting} size="medium" variant="raised" className={classes.button}>
                                                 Submit
-                            </Button>
+                                            </Button>
                                         </div>
                                     </Grid>
                                 </Grid>

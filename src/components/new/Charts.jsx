@@ -11,18 +11,6 @@ import {
 const Charts = () => {
     return (
         <Row style={{paddingTop: '2%'}}>
-        {/* <Col sm="12" xl="12">
-            <Card>
-              <CardHeader>
-                <h5>ColumnChart </h5>
-              </CardHeader>
-              <CardBody>
-                <div id="column-chart">
-                  <Chart options={apexColumnChartsone.options} series={apexColumnChartsone.series} type="bar" height={350} />
-                </div>
-              </CardBody>
-            </Card>
-          </Col> */}
           <Col sm="12" xl="12">
             <Card  style={{boxShadow: '5px 5px 16px #263238'}}>
               <CardHeader>

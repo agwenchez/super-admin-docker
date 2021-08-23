@@ -8,10 +8,11 @@ import { toast } from 'react-toastify';
 import Breadcrumb from '../../layout/breadcrumb';
 import { useHistory, withRouter } from "react-router-dom";
 import Layout from "../AppWrapper"
-
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const api = axios.create({
-    baseURL: `https://afya-kwanza-backend.herokuapp.com`
+    baseURL: `https://afya-kwanza-backend.herokuapp.com/`
   })
   
 
@@ -63,51 +64,52 @@ const MemberEdit = ({location}) => {
     const [id, setId] = useState("");
     const classes = useStyles()
     const history = useHistory()
+    const [selectedDate, setSelectedDate] = React.useState();
 
     
     const getUser = async()=>{
-
+   
+        // console.log("member id==>", location.state.id)
+        setId(location.state.id)
         try {
             const res = await api.get(`/members/member/${id}`)
-            console.log("Response from API", res.data)
-
             const member = res.data
-            console.log("Member data=>", member)
             setData(member)
-            // localStorage.setItem("user", JSON.stringify(res.data))
-            // setData(JSON.parse(localStorage.getItem('user')))    
-            console.log("state data=>", data)
+            setSelectedDate(member.date_of_birth)
+            
         } catch (error) {
             console.log("Error", error)
+        
         }
        
     }
 
     useEffect(() => {
 
-        setId(location.state.id)
-        console.log("member id==>", id)
         getUser()
    
     }, [id])
 
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+     };
 
     const onChange = e => setData({...data, [e.target.name]: e.target.value})
 
     const handleSubmit = async e =>{
       e.preventDefault();
-
-    //   alert(`Name after change :${data.name}`)
   
-      const {name,email,location,insurance_plan,phonenumber,sacco} = data
-  
+      const {full_name, id_number ,email, gender, route_name,phonenumber, sacco, date_of_birth} = data
+    
+    //   console.log('Data=>', data)
       try {
-        const res = await api.put(`/members/update/${id}`, {name,email,location,insurance_plan,phonenumber,sacco})
-        console.log("response object=>", res)
+        const res = await api.put(`/members/update/${id}`, {full_name, id_number ,email, gender, route_name,phonenumber, sacco, date_of_birth})
+        // console.log("response object=>", res.data)
         toast.success(res.data)
         history.push('/dashboard/members')
       } catch (error) {
-        toast.error(error)
+        console.log("Error=>", error)
+        toast.error('Failed to update member')
       }
   
   
@@ -126,20 +128,59 @@ const MemberEdit = ({location}) => {
                                 <Grid container spacing={3}>
                                     <Grid item xs="12" sm="6">
                                         <TextField
-                                            id="name"
-                                            name="name"
-                                            label="NAME"
+                                            id="full_name"
+                                            name="full_name"
+                                            label="FULL NAME"
                                             className={classes.textField}
-                                            placeholder="Enter name"
+                                            placeholder="Enter first name"
                                             margin="normal"
                                             InputLabelProps={{
                                                 shrink: true,
                                             }}
                                             size="small"
                                             variant="outlined"
-                                            value={data.name}
+                                            value={data.full_name}
                                             onChange={e => onChange(e)}
                                             autoFocus
+                                        />
+
+                                    </Grid>
+                                   
+                                    <TextField
+                                        id="date_of_birth"
+                                        name="date_of_birth"
+                                        label="DATE OF BIRTH"
+                                        className={classes.textField}
+                                        placeholder="Enter date of birth (format dd/MM/yyyy)"
+                                        margin="normal"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        // style={{ marginLeft:'6.8%', marginTop:'2.3%' }}
+                                        size="small"
+                                        variant="outlined"
+                                        value={data.date_of_birth}
+                                        onChange={e => onChange(e)}
+                                    />  
+
+                                </Grid>
+                                <Grid container spacing={3}>
+                                    <Grid item xs="12" sm="6">
+                                        <TextField
+                                            id="id_number"
+                                            name="id_number"
+                                            label="ID NUMBER"
+                                            className={classes.textField}
+                                            placeholder="Enter id number"
+                                            margin="normal"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            size="small"
+                                            variant="outlined"
+                                            value={data.id_number}
+                                            onChange={e => onChange(e)}
+                                           
                                         />
 
                                     </Grid>
@@ -152,6 +193,7 @@ const MemberEdit = ({location}) => {
                                             className={classes.textField}
                                             margin="normal"
                                             size="small"
+                                          
                                             InputLabelProps={{
                                                 shrink: true,
                                             }}
@@ -185,7 +227,7 @@ const MemberEdit = ({location}) => {
                                         <TextField
                                             id="sacco"
                                             name="sacco"                                          
-                                            label="Sacco"
+                                            label="SACCO"
                                             className={classes.textField}
                                             style={{ marginTop: '2.3ch' }}
                                             InputLabelProps={{
@@ -202,10 +244,10 @@ const MemberEdit = ({location}) => {
                                 <Grid container spacing={3}>
                                     <Grid item xs>
                                         <TextField
-                                            label="LOCATION"
-                                            id="location"
-                                            name="location"
-                                            placeholder="Location"
+                                            label="GENDER"
+                                            id="gender"
+                                            name="gender"
+                                            placeholder="Gender"
                                             className={classes.textField}
                                             margin="normal"
                                             size="small"
@@ -213,16 +255,16 @@ const MemberEdit = ({location}) => {
                                                 shrink: true,
                                             }}
                                             variant="outlined"
-                                            value={data.location}
+                                            value={data.gender}
                                             onChange={e => onChange(e)}
                                         />
                                     </Grid>
                                     <Grid item xs>
                                         <TextField
-                                            label="INSURANCE PLAN"
-                                            id="insurance_plan"
-                                            name="insurance_plan"
-                                            placeholder="Insurance plan"
+                                            label="ROUTE NAME"
+                                            id="route_name"
+                                            name="route_name"
+                                            placeholder="Route name"
                                             className={classes.textField}
                                             margin="normal"
                                             size="small"
@@ -230,7 +272,7 @@ const MemberEdit = ({location}) => {
                                                 shrink: true,
                                             }}
                                             variant="outlined"
-                                            value={data.insurance_plan}
+                                            value={data.route_name}
                                             onChange={e => onChange(e)}
                                         />
                                     </Grid>

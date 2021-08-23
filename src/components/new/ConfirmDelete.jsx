@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@material-ui/core/';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tooltip } from '@material-ui/core/';
 import DeleteIcon from '@material-ui/icons/Delete';
 
 
@@ -23,7 +23,9 @@ const deleteAndClose = () => {
   return (
     <div >
 
-      <DeleteIcon  onClick={handleClickOpen} style={{ cursor: 'pointer', color: 'red' }}/>
+      <Tooltip title="Delete">
+        <DeleteIcon  onClick={handleClickOpen} style={{ cursor: 'pointer', color: 'red' }}/>        
+      </Tooltip>
       <Dialog
         id="confirm_delete"
         open={open}
@@ -31,7 +33,7 @@ const deleteAndClose = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title"   style={{marginTop:'5%'}}>{"Delete Sacco Member"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title"   style={{marginTop:'5%'}}>{"Confirm Delete"}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
                 Are you sure you want to delete {name}?

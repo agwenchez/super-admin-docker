@@ -906,6 +906,7 @@ export const apexMixedCharts = {
 
 export const apexMemberBarChart = {
     series: [{
+    name:'Members',
     data: [400, 430, 448, 470, 540, 580, 690, 1100, 1200, 1380]
   }],
   options: {
@@ -915,7 +916,7 @@ export const apexMemberBarChart = {
     },
     plotOptions: {
       bar: {
-        horizontal: true,
+        horizontal: false,
       }
     },
     dataLabels: {
@@ -933,6 +934,7 @@ export const apexMemberBarChart = {
 
 export const apexSaccoBarChart = {
   series: [{
+  name:'Saccos',
   data: [5,8,12,13,15,18,20,22,24,26]
 }],
 options: {
@@ -942,8 +944,11 @@ options: {
   },
   plotOptions: {
     bar: {
-      horizontal: true,
+      horizontal: false,
     }
+  },
+  noData: {
+    text: 'Loading...'
   },
   dataLabels: {
     enabled: false
