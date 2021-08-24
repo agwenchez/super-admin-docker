@@ -7,6 +7,11 @@ export const ADD_NEW_ITEM = "ADD_NEW_ITEM";
 export const REMOVE_ITEM = "REMOVE_ITEM";
 export const SELECTED_ITEM = "SELECTED_ITEM";
 
+// SACCOS AND MEMBERS
+export const GET_SACCOS = "GET_SACCOS";
+export const GET_SACCO_MEMBERS = "GET_SACCO_MEMBERS";   
+export const GET_SACCO_PROFILE = "GET_SACCO_PROFILE";
+
 /* ECOMMERRCE APP */
 export const GET_LIST = "GET_LIST";
 export const WATCH_PRODUCT_LIST = "WATCH_PRODUCT_LIST";

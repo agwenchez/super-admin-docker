@@ -5,6 +5,7 @@ import { WatcherEmailApp } from '../redux/email'
 import { watchTodoList } from '../redux/todo';
 import { watchBookmarkList } from "../redux/bookmark";
 import { watcherTaskApp } from "../redux/task-app";
+import { WatcherSaccos } from "../redux/saccos";
 
 export default function* rootSagas() {
     yield all([
@@ -13,6 +14,7 @@ export default function* rootSagas() {
         WatcherEmailApp(),
         watchTodoList(),
         watchBookmarkList(),
-        watcherTaskApp()
+        watcherTaskApp(),
+        WatcherSaccos()
     ])
 }

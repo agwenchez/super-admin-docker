@@ -10,6 +10,9 @@ import Customizer from './customizer/reducer'
 import Bookmarkapp from './bookmark/reducer'
 import Taskapp from './task-app/reducer'
 import Projectapp from './project-app/reducer'
+import Saccos from "./saccos/reducer"
+
+
 const reducers = combineReducers({
     Todoapp,
     data:Ecommerce,
@@ -22,6 +25,7 @@ const reducers = combineReducers({
     Bookmarkapp,
     Taskapp,
     Projectapp,
+    saccos:Saccos
 });
 
 export default reducers;

@@ -1,5 +1,9 @@
 import axios from "axios";
 
+const api = axios.create({
+    baseURL: `https://afya-kwanza-backend.herokuapp.com`
+  })
+
 export const fetchProductApi = () => {
     return axios.get(`${process.env.PUBLIC_URL}/api/product.json`);
 };
@@ -31,3 +35,19 @@ export const fetchTaskApi = () => {
 export const fetchProjectApi = () => {
     return axios.get(`${process.env.PUBLIC_URL}/api/project.json`);
 };
+
+
+export const fetchSaccosApi = () => {
+    return api.get(`/saccos/all`, {
+     headers: { token: localStorage.tokenated}
+    });
+};
+
+
+export const fetchMembersApi = () => {
+    return api.get(`/members/all`, {
+        // headers: { token: localStorage.tokenated}
+       });
+};
+
+

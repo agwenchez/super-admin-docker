@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect, forwardRef } from 'react';
+import React, { Fragment, useState, useEffect, forwardRef, useSelector, useDispatch } from 'react';
 import { Container } from 'reactstrap'
 import { Grid, Button, Tooltip } from '@material-ui/core/'
 import MaterialTable from "material-table";
@@ -14,6 +14,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import Avatar from 'react-avatar';
 import ConfirmDelete from './ConfirmDelete';
 import CustomizedProgressBars from './CircularProgress';
+import { fetchSaccos } from '../../redux/saccos/action';
 
 
 const tableIcons = {
@@ -49,6 +50,11 @@ const SaccoTable = () => {
   const [loading, setLoading] = useState(false)
 
   const history = useHistory();
+  // const dispatch = useDispatch()
+
+  // const saccos = useSelector(state => state.Saccos.saccos)
+  // console.log('Saccos from redux saga=>', saccos)
+
 
   var columns = [
     // { render: rowData => rowData.tableData.id + 1 },
@@ -133,7 +139,14 @@ const SaccoTable = () => {
       ).catch(error => {
         console.log("Error", error)
       })
+
+
+      // dispatch(fetchSaccos())
+      // console.log("Saccos from Redux-saga", saccos)
   }, [])
+
+  // const saccos = useSelector(state => state.saccos)
+  // console.log('Saccos from redux saga=>', saccos)
 
   // const redirectToReport = (rowData) => {
   //   // const { history } = props;
